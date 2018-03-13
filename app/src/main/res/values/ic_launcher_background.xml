@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="saved_mass_default_key">75</integer>
+    <color name="ic_launcher_background">#EEE6E6</color>
 </resources>

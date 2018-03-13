@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuItemSave"
+        android:title="Save"
+        android:enabled="true"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_save_black_24dp">
+    </item>
+    <item
+        android:title="Main menu"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_more_vert_black_24dp">
+        <menu>
+            <item
+                android:id="@+id/menuItemAboutAuthor"
+                android:title="@string/author"
+                android:icon="@drawable/ic_person_black_24dp"/>
 
-    <item
-        android:id="@+id/menu_item_save"
-        android:title="@string/save" />
-    <item
-        android:id="@+id/menu_item_author"
-        android:title="@string/author" />
+
+        </menu>
+    </item>
+
 </menu>
+
+
