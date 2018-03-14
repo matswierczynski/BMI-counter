@@ -1,17 +1,17 @@
 package com.example.matik.bmi;
 
 /**
- * Created by matik on 10.03.2018.
+ * Created by Mateusz Swierczynski
  */
 
 public final class EnglishUnitFactory extends UnitFactory {
 
     private static EnglishUnitFactory _instance=null;
-    private float converter = 0.0703f;
+    private static float converter = 0.0703f;
 
-    protected EnglishUnitFactory(){};
+    private EnglishUnitFactory(){}
 
-    public static EnglishUnitFactory Instance() {
+    static EnglishUnitFactory Instance() {
         if (_instance == null)
             _instance = new EnglishUnitFactory();
         return _instance;
