@@ -16,22 +16,25 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     public static final String RESULT_EXTRA_MESSAGE = "com.example.matik.bmi.RESULT_MESSAGE";
+    public static final int    NUMBER_OF_UNITS = 2;
+    private String massEditTextValue;
+    private String heightEditTextValue;
     private UnitFactory [] unitFactory;
     private UnitFactory currentUnits;
-    private boolean unitFlag = true;
+    private int unitFlag;
    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_main);
         super.onCreate(savedInstanceState);
-        unitFactory = new UnitFactory[2];
+
+        unitFactory = new UnitFactory[NUMBER_OF_UNITS];
         unitFactory[0]=MetricUnitFactory.Instance();
         unitFactory[1]=EnglishUnitFactory.Instance();
         currentUnits = unitFactory[0];
-        setContentView(R.layout.activity_main);
+
        final Button countButton = findViewById(R.id.countButton);
        countButton.setOnClickListener(new View.OnClickListener() {
-                                     public void onClick(View v) {
-                                        CountResult();
-                                     }
+                                     public void onClick(View v) {CountResult();}
                                  });
        final Button unitButton = findViewById(R.id.changeUnitButton);
        unitButton.setOnClickListener(new View.OnClickListener() {
@@ -42,8 +45,22 @@ public class MainActivity extends AppCompatActivity {
         getSharedPreferencesData();
    }
 
+   @Override
+   protected void onPause(){
+       super.onPause();
+       massEditTextValue = getCurrentValue(R.id.massEditText);
+       heightEditTextValue = getCurrentValue(R.id.heightEditText);
+   }
 
-    @Override
+   @Override
+   protected void onResume(){
+       super.onResume();
+       setTextView(R.id.massEditText, massEditTextValue);
+       setTextView(R.id.heightEditText, heightEditTextValue);
+   }
+
+
+    @Override //creates new menu
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_menu, menu);
@@ -65,15 +82,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    String getCurrentValue(int id){
-       final EditText editText;
-       String value;
-       editText = findViewById(id);
-       value = editText.getText().toString();
-       return value;
-    }
-
-
     private void getSharedPreferencesData(){
         SharedPreferences sharedPref = this.getPreferences(
                 Context.MODE_PRIVATE);
@@ -81,11 +89,10 @@ public class MainActivity extends AppCompatActivity {
         String defaultHeight = this.getString(R.string.saved_height_default_value);
         String mass = sharedPref.getString(getString(R.string.mass_file_key), defaultMass);
         String height = sharedPref.getString(getString(R.string.height_file_key), defaultHeight);
-        EditText heightEditText, massEditText;
-        heightEditText = findViewById(R.id.heightEditText);
-        massEditText = findViewById(R.id.massEditText);
-        heightEditText.setText(height);
-        massEditText.setText(mass);
+        setTextView(R.id.heightEditText, height);
+        setTextView(R.id.massEditText, mass);
+        massEditTextValue = mass;
+        heightEditTextValue = height;
     }
 
     private void onSaveMenuOption(){
@@ -104,18 +111,6 @@ public class MainActivity extends AppCompatActivity {
         displayDefaultToast(toastMessage);
     }
 
-    private void displayDefaultToast(String toastMessage){
-        Toast.makeText(this,
-                toastMessage,
-                Toast.LENGTH_SHORT)
-                .show();
-    }
-
-
-    private float parseNumber(String stringToParse) throws NumberFormatException {
-        return Float.parseFloat(stringToParse);
-    }
-
     private void CountResult(){
         float result;
         float mass=0;
@@ -130,14 +125,42 @@ public class MainActivity extends AppCompatActivity {
         }catch (NumberFormatException nfe){displayDefaultToast("Enter height value");}
 
         try{
-             result = currentUnits.countBMI(mass, height);
-             onCountBMIButtonClicked(result);
+            result = currentUnits.countBMI(mass, height);
+            onCountBMIButtonClicked(result);
         }catch
-                (heightValueException exc){displayDefaultToast("Height ou of range");}
-         catch
-                 (massValueException exc){displayDefaultToast("Mass out of range");}
+                (heightValueException exc){displayDefaultToast("Height out of range");}
+        catch
+                (massValueException exc){displayDefaultToast("Mass out of range");}
 
     }
+
+    String getCurrentValue(int id){
+        final EditText editText;
+        String value;
+        editText = findViewById(id);
+        value = editText.getText().toString();
+        return value;
+    }
+
+    void setTextView(int id, String text){
+        EditText editText;
+        editText = findViewById(id);
+        editText.setText(text);
+    }
+
+    private void displayDefaultToast(String toastMessage){
+        Toast.makeText(this,
+                toastMessage,
+                Toast.LENGTH_SHORT)
+                .show();
+    }
+
+
+    private float parseNumber(String stringToParse) throws NumberFormatException {
+        return Float.parseFloat(stringToParse);
+    }
+
+
 
     private void onAboutAuthorMenuOption()
     {
@@ -153,17 +176,16 @@ public class MainActivity extends AppCompatActivity {
     }
     private void changeUnits(){
         //default units are metric, flag = true
-        if (unitFlag){
-        currentUnits = unitFactory[1];
-        unitFlag=false;
-        setEnglishUnits();
-        }
 
-        else{
-            currentUnits = unitFactory[0];
-            unitFlag=true;
+        unitFlag = (unitFlag+1) % NUMBER_OF_UNITS;
+
+        if (unitFlag == 0)
             setMetricUnits();
-        }
+
+        else if (unitFlag == 1)
+            setEnglishUnits();
+
+        currentUnits = unitFactory[unitFlag];
     }
 
     private void setEnglishUnits(){

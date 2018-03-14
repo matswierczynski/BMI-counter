@@ -17,12 +17,6 @@ public class ResultActivity extends AppCompatActivity {
         ViewResult();
     }
 
-    @Override
-    public void onBackPressed(){
-        finishAffinity();
-
-    }
-
     private void ViewResult(){
         Float result = getIntent().getFloatExtra(MainActivity.RESULT_EXTRA_MESSAGE, 0.00f);
         TextView textView = findViewById(R.id.BMITextView);
