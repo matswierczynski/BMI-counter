@@ -59,6 +59,13 @@ public class MainActivity extends AppCompatActivity {
        setTextView(R.id.heightEditText, heightEditTextValue);
    }
 
+   @Override
+   protected void onStop(){
+       super.onStop();
+       setTextView(R.id.massEditText, massEditTextValue);
+       setTextView(R.id.heightEditText, heightEditTextValue);
+   }
+
 
     @Override //creates new menu
     public boolean onCreateOptionsMenu(Menu menu) {
