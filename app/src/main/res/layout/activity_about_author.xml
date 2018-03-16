@@ -10,10 +10,16 @@
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/authorImage"
@@ -57,6 +63,8 @@
             app:layout_constraintTop_toBottomOf="@+id/authorImage" />
 
     </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->

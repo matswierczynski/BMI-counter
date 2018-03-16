@@ -11,8 +11,9 @@
     <string name="mass_textView_en">mass [Ibs]</string>
     <string name="height_TextView_en">height [in]</string>
     <string name="saved_mass_default_key">75</string>
-    <string name="saved_height_default_value">1.60</string>
+    <string name="saved_height_default_value">160</string>
     <string name="bmiResult">Your score</string>
+
 
     <string name="title_activity_result">ResultActivity</string>
     <string name="countButton">Count BMI</string>
