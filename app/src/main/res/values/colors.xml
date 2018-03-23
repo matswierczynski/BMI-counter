@@ -3,6 +3,8 @@
     <color name="colorPrimary">#3f51b5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-
     <color name="black_overlay">#66000000</color>
+    <color name="colorUnderweight">#FFFF11</color>
+    <color name="colorBalancedWeight">#55AA55</color>
+    <color name="colorOverweight">#FF2222</color>
 </resources>

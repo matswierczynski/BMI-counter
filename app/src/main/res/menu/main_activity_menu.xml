@@ -4,19 +4,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menuItemSave"
-        android:title="Save"
+        android:title="@string/save"
         android:enabled="true"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/ic_save_black_24dp">
     </item>
     <item
-        android:title="Main menu"
-        app:showAsAction="always"
+        android:title="@string/menu"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/ic_more_vert_black_24dp">
         <menu>
             <item
                 android:id="@+id/menuItemAboutAuthor"
-                android:title="@string/author"
+                android:title="@string/about_author_TextView"
                 android:icon="@drawable/ic_person_black_24dp"/>
 
 

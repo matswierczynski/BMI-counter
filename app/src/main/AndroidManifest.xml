@@ -22,7 +22,7 @@
             android:name=".ResultActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".AboutAuthor"
+            android:name=".AboutAuthorActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen"
             android:theme="@style/FullscreenTheme" />

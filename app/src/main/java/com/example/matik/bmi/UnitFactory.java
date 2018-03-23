@@ -1,26 +1,30 @@
 package com.example.matik.bmi;
 
 /**
- * Created by matik on 10.03.2018.
+ * Created by Mateusz Swierczynski
  */
 
 public abstract class UnitFactory {
 
-    abstract boolean isMassValid(float value);
-    abstract boolean isHeightValid(float value);
-    public float countBMI(float mass, float height)
-                    throws heightValueException, massValueException{
+    private final int CENTIMETERS_TO_METERS_DIVIDER = 100;
+    abstract  boolean isMassValid(int value);
+    abstract  boolean isHeightValid(int value);
+
+    boolean isStringEmpty(final String s) {
+        return s == null || s.trim().isEmpty();
+    }
+    protected double countBMI(int mass, int height)
+                    throws HeightValueException, MassValueException {
         if (isHeightValid(height)){
             if (isMassValid(mass)){
-                //change from cm to m
-                height/=100;
-                return mass/(height*height);
+                double heightInMeters = (double)height/CENTIMETERS_TO_METERS_DIVIDER;
+                return (double)mass/(heightInMeters*heightInMeters);
             }
             else
-                throw new massValueException();
+                throw new MassValueException();
         }
         else
-            throw new heightValueException();
+            throw new HeightValueException();
     }
 
 }

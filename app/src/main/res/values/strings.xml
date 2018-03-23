@@ -2,25 +2,24 @@
     <string name="app_name">BMI</string>
     <string name="save">Save</string>
     <string name="author">About author</string>
-    <string name="mass_file_key">com.example.matik.bmi.MASS_FILE_KEY</string>
-    <string name="height_file_key">com.example.matik.bmi.HEIGHT_FILE_KEY</string>
     <string name="save_successful">Saved data successfully</string>
-    <string name="save_error">Cannot save\nIncorrect data</string>
+    <string name="empty_field">Field is empty\nInput correct value</string>
     <string name="mass_textView">mass [kg]</string>
     <string name="height_TextView">height [cm]</string>
     <string name="mass_textView_en">mass [Ibs]</string>
     <string name="height_TextView_en">height [in]</string>
-    <string name="saved_mass_default_key">75</string>
-    <string name="saved_height_default_value">160</string>
+    <string name="parsing_not_successful">Value not parsable</string>
+    <string name="mass_out_of_range">Mass out of range</string>
+    <string name="height_out_of_range">Height out of range</string>
     <string name="bmiResult">Your score</string>
-
-
+    <string name="about_author_TextView">About author</string>
     <string name="title_activity_result">ResultActivity</string>
     <string name="countButton">Count BMI</string>
     <string name="changeUnitsButton">Change Units</string>
     <string name="author_name">Mateusz</string>
     <string name="author_surname">Świerczyński</string>
     <string name="BMITextView">Your score</string>
+    <string name="menu">Main menu</string>
 
     <string name="title_activity_fullscreen">About Author</string>
 

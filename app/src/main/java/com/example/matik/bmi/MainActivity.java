@@ -3,7 +3,6 @@ package com.example.matik.bmi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,54 +15,74 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String RESULT_EXTRA_MESSAGE = "com.example.matik.bmi.RESULT_MESSAGE";
-    public static final int    NUMBER_OF_UNITS = 2;
-    public static boolean IS_FIRST_ACTIVITY_CREATION = false;
-    private static String massEditTextValue;
-    private static String heightEditTextValue;
+    private static final int    NUMBER_OF_UNITS = 2;
+    private static boolean IS_FIRST_ACTIVITY_CREATION = false;
+    final static String MASS_VALUE_KEY=
+            "com.example.matik.bmi.ResultActivity.Mass_Value.Extra_Message";
+    final static String HEIGHT_VALUE_KEY=
+            "com.example.matik.bmiResultActivity.Height_Value.Extra_Message";
+    private static final int DEFAULT_VALUE = 0;
+    private static String massCurrentValue;
+    private static String heightCurrentValue;
     private UnitFactory [] unitFactory;
     private UnitFactory currentUnits;
     private int unitFlag;
+
+    public static void startAboutAuthor(Context context) {
+        Intent starter = new Intent(context, AboutAuthorActivity.class);
+        context.startActivity(starter);
+    }
+
+    public static void startResultActivity(Context context, double calculatedBMI) {
+        Intent starter = new Intent(context, ResultActivity.class);
+        starter.putExtra(Intent.EXTRA_TEXT, calculatedBMI);
+        context.startActivity(starter);
+    }
 
    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
         super.onCreate(savedInstanceState);
 
-        unitFactory = new UnitFactory[NUMBER_OF_UNITS];
-        unitFactory[0]=MetricUnitFactory.Instance();
-        unitFactory[1]=EnglishUnitFactory.Instance();
-        currentUnits = unitFactory[0];
+        initUnitFactory();
 
-       final Button countButton = findViewById(R.id.countButton);
-       countButton.setOnClickListener(new View.OnClickListener() {
-                                     public void onClick(View v) {CountResult();}
-                                 });
+       final Button calculateButton = findViewById(R.id.countButton);
+       calculateButton.setOnClickListener(onClickCalculateButtonListener);
+
        final Button unitButton = findViewById(R.id.changeUnitButton);
-       unitButton.setOnClickListener(new View.OnClickListener() {
-           public void onClick(View v) {
-               changeUnits();
-           }
-       });
+       unitButton.setOnClickListener(onClickUnitsButtonListener);
+
        if (!IS_FIRST_ACTIVITY_CREATION) {
-           getSharedPreferencesData();
+           setFieldsFromSharedPreferences();
            IS_FIRST_ACTIVITY_CREATION = true;
        }
 
        if (savedInstanceState != null) {
-           setTextView(R.id.massEditText, massEditTextValue);
-           setTextView(R.id.heightEditText, heightEditTextValue);
+           ((EditText)findViewById(R.id.massEditText)).setText(massCurrentValue);
+           ((EditText)findViewById(R.id.heightEditText)).setText(heightCurrentValue);
        }
    }
 
+   private View.OnClickListener onClickUnitsButtonListener = new View.OnClickListener() {
+       @Override
+       public void onClick(View v) {
+           changeUnits();
+       }
+   };
+
+    private View.OnClickListener onClickCalculateButtonListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            calculateBMI();
+        }
+    };
 
    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        massEditTextValue = getCurrentValue(R.id.massEditText);
-        heightEditTextValue = getCurrentValue(R.id.heightEditText);
+        massCurrentValue = ((EditText)findViewById(R.id.massEditText)).getText().toString();
+        heightCurrentValue = ((EditText)findViewById(R.id.heightEditText)).getText().toString();
     }
-
 
     @Override //creates new menu
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -77,89 +96,91 @@ public class MainActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menuItemSave:
-                onSaveMenuOption();
+                onMenuOptionSaveClicked();
                 return true;
             case R.id.menuItemAboutAuthor:
-                onAboutAuthorMenuOption();
+                startAboutAuthor(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void getSharedPreferencesData(){
+    private void initUnitFactory(){
+        unitFactory = new UnitFactory[NUMBER_OF_UNITS];
+        unitFactory[0]=MetricUnitFactory.Instance();
+        unitFactory[1]=EnglishUnitFactory.Instance();
+        currentUnits = unitFactory[0];
+
+    }
+
+    private void setFieldsFromSharedPreferences(){
         SharedPreferences sharedPref = this.getPreferences(
-                Context.MODE_PRIVATE);
-        String defaultMass = this.getString(R.string.saved_mass_default_key);
-        String defaultHeight = this.getString(R.string.saved_height_default_value);
-        String mass = sharedPref.getString(getString(R.string.mass_file_key), defaultMass);
-        String height = sharedPref.getString(getString(R.string.height_file_key), defaultHeight);
-        setTextView(R.id.massEditText, mass);
-        setTextView(R.id.heightEditText, height);
-        massEditTextValue = mass;
-        heightEditTextValue = height;
+                                        Context.MODE_PRIVATE);
+
+        int massCurrentValue = sharedPref.getInt(MASS_VALUE_KEY, DEFAULT_VALUE);
+        int heightCurrentValue = sharedPref.getInt(HEIGHT_VALUE_KEY, DEFAULT_VALUE);
+        ((EditText)findViewById(R.id.massEditText)).setText(
+                String.valueOf(massCurrentValue));
+        ((EditText)findViewById(R.id.heightEditText)).setText(
+                String.valueOf(heightCurrentValue));
     }
 
-    private void onSaveMenuOption(){
-        //try-catch for empty string as input
-        Float mass=0f, height=0f;
-        try {
-            mass = parseNumber(getCurrentValue(R.id.massEditText));
-        }catch (NumberFormatException nfe){}
+    private void onMenuOptionSaveClicked() {
+        saveToSharedPref(parseDataFromField(R.id.massEditText),
+                parseDataFromField(R.id.heightEditText));
+    }
 
-        try {
-            height = parseNumber(getCurrentValue(R.id.heightEditText));
-        }catch (NumberFormatException nfe){}
-
-        Context context = this;
-        String toastMessage=context.getString(R.string.save_error);
-        if (currentUnits.isMassValid(mass) &&
-                currentUnits.isHeightValid(height)){
-            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-            sharedPref.edit().putString(context.getString(R.string.mass_file_key),
-                                        String.format("%.0f", mass)).apply();
-            sharedPref.edit().putString(context.getString(R.string.height_file_key),
-                                        String.format("%.0f",height)).apply();
-            toastMessage=context.getString(R.string.save_successful);
+    private int parseDataFromField(int fieldId){
+        String valueFromEditText;
+        int currentEditTextValue=0;
+        valueFromEditText   = ((EditText)findViewById(fieldId)).getText().toString();
+        if (!currentUnits.isStringEmpty(valueFromEditText)){
+            try {
+                 currentEditTextValue = Integer.parseInt(valueFromEditText);
+            } catch (NumberFormatException nfe) {
+                displayDefaultToast(getResources().getString(R.string.parsing_not_successful));
+            }
         }
-        displayDefaultToast(toastMessage);
+        else
+            displayDefaultToast(getResources().getString(R.string.empty_field));
+        return currentEditTextValue;
     }
 
-    private void CountResult(){
-        float result;
-        float mass=0;
-        float height=0;
-
-        try {
-            mass = parseNumber(getCurrentValue(R.id.massEditText));
-        }catch (NumberFormatException nfe){displayDefaultToast("Enter mass value");}
-
-        try {
-            height = parseNumber(getCurrentValue(R.id.heightEditText));
-        }catch (NumberFormatException nfe){displayDefaultToast("Enter height value");}
-
-        try{
-            result = currentUnits.countBMI(mass, height);
-            onCountBMIButtonClicked(result);
-        }catch
-                (heightValueException exc){displayDefaultToast("Height out of range");}
-        catch
-                (massValueException exc){displayDefaultToast("Mass out of range");}
-
+    private boolean validateData(int mass, int height){
+        if (currentUnits.isMassValid(mass)) {
+            if (currentUnits.isHeightValid(height)) {
+                return true;
+            } else
+                displayDefaultToast(getResources().getString(R.string.height_out_of_range));
+        }
+        else
+            displayDefaultToast(getResources().getString(R.string.mass_out_of_range));
+        return false;
     }
 
-    String getCurrentValue(int id){
-        final EditText editText;
-        String value;
-        editText = findViewById(id);
-        value = editText.getText().toString();
-        return value;
+    private void saveToSharedPref(int mass, int height){
+        if (validateData(mass, height)) {
+                SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                sharedPref.edit().putInt(MASS_VALUE_KEY, mass).apply();
+                sharedPref.edit().putInt(HEIGHT_VALUE_KEY, height).apply();
+                displayDefaultToast(getResources().getString(R.string.save_successful));
+            }
     }
 
-    void setTextView(int id, String text){
-        EditText editText;
-        editText = findViewById(id);
-        editText.setText(text);
+    private void calculateBMI(){
+        double result;
+        int mass   = parseDataFromField(R.id.massEditText);
+        int height = parseDataFromField(R.id.heightEditText);
+        if (validateData(mass, height)){
+            try {
+                result = currentUnits.countBMI(mass, height);
+                startResultActivity(this, result);
+            }catch (MassValueException massValExc){displayDefaultToast(
+                    getResources().getString(R.string.mass_out_of_range));}
+             catch (HeightValueException heightValExc){displayDefaultToast(
+                    getResources().getString(R.string.height_out_of_range));}
+        }
     }
 
     private void displayDefaultToast(String toastMessage){
@@ -169,30 +190,10 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-
-    private float parseNumber(String stringToParse) throws NumberFormatException {
-        return Float.parseFloat(stringToParse);
-    }
-
-
-
-    private void onAboutAuthorMenuOption()
-    {
-        Intent intent = new Intent(MainActivity.this, AboutAuthor.class);
-        startActivity(intent);
-    }
-
-    private void onCountBMIButtonClicked(float bmi)
-    {
-        Intent intent = new Intent(MainActivity.this, ResultActivity.class);
-        intent.putExtra(RESULT_EXTRA_MESSAGE,bmi);
-        startActivity(intent);
-    }
     private void changeUnits(){
-        //default units are metric
 
-        setTextView(R.id.massEditText, "");
-        setTextView(R.id.heightEditText, " ");
+        ((EditText)findViewById(R.id.massEditText)).setText("");
+        ((EditText)findViewById(R.id.heightEditText)).setText("");
 
         unitFlag = (unitFlag+1) % NUMBER_OF_UNITS;
 
@@ -205,18 +206,20 @@ public class MainActivity extends AppCompatActivity {
         currentUnits = unitFactory[unitFlag];
     }
 
+    /*Function to set english units on massTextView & heightTextView*/
     private void setEnglishUnits(){
-        TextView mTextView = this.findViewById(R.id.massTextView);
-        TextView hTextView = this.findViewById(R.id.heightTextView);
-        mTextView.setText(R.string.mass_textView_en);
-        hTextView.setText(R.string.height_TextView_en);
+        ((TextView)findViewById(R.id.massTextView)).setText(
+                getResources().getString(R.string.mass_textView_en));
+        ((TextView)findViewById(R.id.heightTextView)).setText(
+                getResources().getString(R.string.height_TextView_en));
     }
 
+    /*Function to set metric units on massTextView & heightTextView*/
     private void setMetricUnits(){
-        TextView mTextView = this.findViewById(R.id.massTextView);
-        TextView hTextView = this.findViewById(R.id.heightTextView);
-        mTextView.setText(R.string.mass_textView);
-        hTextView.setText(R.string.height_TextView);
+        ((TextView)findViewById(R.id.massTextView)).setText(
+                getResources().getString(R.string.mass_textView));
+        ((TextView)findViewById(R.id.heightTextView)).setText(
+                getResources().getString(R.string.height_TextView));
     }
 
 }

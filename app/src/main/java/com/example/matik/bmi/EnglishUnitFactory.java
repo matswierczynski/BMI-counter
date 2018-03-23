@@ -5,9 +5,12 @@ package com.example.matik.bmi;
  */
 
 public final class EnglishUnitFactory extends UnitFactory {
-
+    private static final int LOWER_BOUNDARY_OF_CORRECT_MASS = 100;
+    private static final int UPPER_BOUNDARY_OF_CORRECT_MASS = 215;
+    private static final int LOWER_BOUNDARY_OF_CORRECT_HEIGHT = 50;
+    private static final int UPPER_BOUNDARY_OF_CORRECT_HEIGHT = 80;
+    private static final double ENGLISH_UNITS_COEFFICIENT = 0.0703;
     private static EnglishUnitFactory _instance=null;
-    private static float converter = 0.0703f;
 
     private EnglishUnitFactory(){}
 
@@ -18,19 +21,21 @@ public final class EnglishUnitFactory extends UnitFactory {
     }
 
     @Override
-    boolean isMassValid(float value) {
-        return ( value >= 100 && value <=215);
+    boolean isMassValid(int value) {
+        return ( value >= LOWER_BOUNDARY_OF_CORRECT_MASS &&
+                 value <= UPPER_BOUNDARY_OF_CORRECT_MASS);
     }
 
     @Override
-    boolean isHeightValid(float value) {
-        return (value > 50 && value <= 80);
+    boolean isHeightValid(int value) {
+        return (value > LOWER_BOUNDARY_OF_CORRECT_HEIGHT &&
+                value <= UPPER_BOUNDARY_OF_CORRECT_HEIGHT);
     }
 
     @Override
-    public float countBMI(float mass, float height)
-            throws heightValueException, massValueException {
-        float result = super.countBMI(mass, height);
-        return result*converter;
+    public double countBMI(int mass, int height)
+            throws HeightValueException, MassValueException {
+        double result = super.countBMI(mass, height);
+        return result*ENGLISH_UNITS_COEFFICIENT;
     }
 }

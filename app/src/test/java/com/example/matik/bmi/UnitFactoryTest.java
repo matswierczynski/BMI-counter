@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -17,23 +16,23 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 public class UnitFactoryTest {
 
-    private float currentMass;
-    private float currentHeight;
-    private float expected;
+    private int currentMass;
+    private int currentHeight;
+    private double expected;
     private static MetricUnitFactory metricUnitFactory;
 
 
     @Parameterized.Parameters
     public static Collection<Object[]> data(){
         return Arrays.asList(new Object[][] {
-                {46f, 141f, 23.14f}, {60f, 150f, 26.67f}, {70f, 150f, 31.11f}, {70f, 160f, 27.34f},
-                {80f, 160f, 31.25f}, {70f, 170f, 24.22f}, {80f, 170f, 27.68f}, {80f, 180f, 24.69f},
-                {90f, 180f, 27.78f}, {100f, 180f, 30.86f}, {120f, 160f, 46.88f }, {140, 190, 38.78f },
-                {150, 195f, 39.45f}
+                {46, 141, 23.14}, {60, 150, 26.67}, {70, 150, 31.11}, {70, 160, 27.34},
+                {80, 160, 31.25}, {70, 170, 24.22}, {80, 170, 27.68}, {80, 180, 24.69},
+                {90, 180, 27.78}, {100, 180, 30.86}, {120, 160, 46.88 }, {140, 190, 38.78 },
+                {150, 195, 39.45}
         });
     }
 
-    public UnitFactoryTest(float mass, float height, float exp){
+    public UnitFactoryTest(int mass, int height, double exp){
         currentMass=mass;
         currentHeight=height;
         expected=exp;
@@ -42,16 +41,16 @@ public class UnitFactoryTest {
 
     @BeforeClass
     public static void onlyOnce(){
-        metricUnitFactory = new MetricUnitFactory();
+        metricUnitFactory = MetricUnitFactory.Instance();
     }
 
 
     @Test
     public void countBMI() throws Exception {
-        assertEquals(expected,metricUnitFactory.countBMI(currentMass, currentHeight),0.01f);
+        assertEquals(expected,metricUnitFactory.countBMI(currentMass, currentHeight),0.01);
     }
 
-    @Test(expected = heightValueException.class)
+    @Test(expected = HeightValueException.class)
     public void HeightOutOfRangecountBMI() throws Exception {
         assertEquals(-2000, metricUnitFactory.countBMI(-10, -20), 0.01);
         assertEquals(2000,  metricUnitFactory.countBMI(0,   0),   0.01);
@@ -59,7 +58,7 @@ public class UnitFactoryTest {
         assertEquals(40,    metricUnitFactory.countBMI(160, 200), 0.01);
     }
 
-    @Test(expected = massValueException.class)
+    @Test(expected = MassValueException.class)
     public void MassOutOfRangecountBMI() throws Exception {
         assertEquals(-2000, metricUnitFactory.countBMI(-10, 150), 0.01);
         assertEquals(2000,  metricUnitFactory.countBMI(0,   150), 0.01);
